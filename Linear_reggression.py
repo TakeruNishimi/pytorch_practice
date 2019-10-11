@@ -1,10 +1,12 @@
+from typing import Tuple
+
 import matplotlib.pyplot as plt
 import torch
 
 
 # methodsを使ってリファクタリング
 
-def prepare_data(N: int, w_true: torch.Tensor):
+def prepare_data(N: int, w_true: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
     X = torch.cat([torch.ones(N, 1),
                    torch.randn(N, 2)],
                   dim=1)
@@ -43,18 +45,19 @@ def main():
         y_pred = torch.mv(X, w)
         # 損失の計算
         loss = torch.mean((y_pred - y) ** 2)
+        loss_list.append(loss.item())
         # 誤差逆伝播による勾配計算
         # フォアードプロパゲーションのあとバックプロパゲーションで微分
         loss.backward()
-
-        print(f'Epoch = {epoch}: Loss= {loss.item():.4f} w={w} dL/dw = {w.grad.data}')
+        # print(f'Epoch = {epoch}: Loss= {loss.item():.4f} w={w} dL/dw = {w.grad.data}')
         # 重みの更新
         w.data = w - learning_rate * w.grad.data
-        loss_list.append(loss.item())
+
     plt.plot(loss_list)
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
     plt.show()
+
 
 if __name__ == '__main__':
     main()
